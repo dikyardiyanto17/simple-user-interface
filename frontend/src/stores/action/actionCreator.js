@@ -94,20 +94,36 @@ export const getCurrentUser = () => {
 };
 
 export const changeRole = (role, id) => {
-    return (dispatch) => {
-      return fetch(baseUrl + "/users/" + id, {
-        method: "put",
-        headers: {
-          "Content-Type": "application/json",
-          access_token: localStorage.access_token,
-        },
-        body: JSON.stringify({role})
+  return (dispatch) => {
+    return fetch(baseUrl + "/users/" + id, {
+      method: "put",
+      headers: {
+        "Content-Type": "application/json",
+        access_token: localStorage.access_token,
+      },
+      body: JSON.stringify({ role }),
+    })
+      .then((resp) => resp.json())
+      .then((data) => {
+        return data;
       })
-        .then((resp) => resp.json())
-        .then((data) => {
-            return data
-        })
-        .catch((error) => console.log(error));
-    };
+      .catch((error) => console.log(error));
   };
-  
+};
+
+export const deleteUser = (id) => {
+  return (dispatch) => {
+    return fetch(baseUrl + "/users/" + id, {
+      method: "delete",
+      headers: {
+        "Content-Type": "application/json",
+        access_token: localStorage.access_token,
+      },
+    })
+      .then((resp) => resp.json())
+      .then((data) => {
+        return data;
+      })
+      .catch((error) => console.log(error));
+  };
+};

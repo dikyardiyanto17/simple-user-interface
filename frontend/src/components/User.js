@@ -1,16 +1,36 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { changeRole, getCurrentUser, getUsers } from "../stores/action/actionCreator";
+import {
+  changeRole,
+  deleteUser,
+  getCurrentUser,
+  getUsers,
+} from "../stores/action/actionCreator";
 // import Form from "react-bootstrap/Form";
 import Swal from "sweetalert2";
+import Button from "react-bootstrap/Button";
 // import RoleOptions from "./RoleOptions";
 
 export default function User({ index, user }) {
   const roles = useSelector((state) => state.users.role);
   const [role, setRole] = useState("");
+  const [canBeChanged, setCanBeChanged] = useState(false);
   const dispatch = useDispatch();
   const changeHandler = (e) => {
     setRole(e.target.value);
+  };
+
+  const deletingUser = (id) => {
+    dispatch(deleteUser(id))
+      .then(() => {
+        Swal.fire({
+          icon: "success",
+          title: "Success deleting user",
+        });
+      })
+      .then(() => {
+        dispatch(getUsers());
+      });
   };
 
   const submitHandler = (e) => {
@@ -21,10 +41,10 @@ export default function User({ index, user }) {
           icon: "success",
           title: data.message,
         });
-        return data
+        return data;
       })
-      .then(()=> {
-        dispatch(getUsers())
+      .then(() => {
+        dispatch(getUsers());
       })
       .catch((error) => {
         Swal.fire({
@@ -42,28 +62,34 @@ export default function User({ index, user }) {
         <td style={{ maxWidth: "10px" }}>{index + 1}</td>
         <td style={{ maxWidth: "100px", minWidth: "100px" }}>{user.name}</td>
         <td style={{ maxWidth: "100px", minWidth: "100px" }}>{user.role}</td>
-        {roles === "Admin" && (
-          <td>
-            {/* <form>
-
-              <Form.Select aria-label="Default select example">
-                    {status.map((stat, index) => {
-                        return <RoleOptions key={index} stat={stat} role={user.role} />
-                    })}
-              </Form.Select>
-              <button type="submit" className="btn btn-dark">
-                Edit Status
-              </button>
-            </form> */}
-            <form onSubmit={submitHandler}>
-              <select onChange={changeHandler} name="role">
-                <option hidden>Change Role</option>
-                <option value="Admin">Admin</option>
-                <option value="Staf">Staf</option>
-              </select>
-              <input type="submit" value="Submit" />
-            </form>
-          </td>
+        {roles === "Admin" && user.role !== "Admin" ? (
+          <>
+            <td>
+              <form onSubmit={submitHandler}>
+                <select onChange={changeHandler} name="role">
+                  <option hidden>Change Role</option>
+                  <option value="Admin">Admin</option>
+                  <option value="Staf">Staf</option>
+                </select>
+                <input type="submit" value="Update" />
+              </form>
+            </td>
+            <td>
+              <Button
+                variant="dark"
+                onClick={() => {
+                  deletingUser(user._id);
+                }}
+              >
+                Delete
+              </Button>
+            </td>
+          </>
+        ) : (
+          <>
+            <td>No action available</td>
+            <td>No action available</td>
+          </>
         )}
       </tr>
     </>
