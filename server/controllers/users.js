@@ -1,90 +1,49 @@
-const Task = require("../schema/Task");
+const { hashPassword, comparePassword } = require("../helpers/bcryptjs");
+const { encodeToken } = require("../helpers/jwt");
+const User = require("../schema/User");
 
-class Tasks {
-  static async newTask(req, res, next) {
+class Users {
+  static async register(req, res, next) {
     try {
-      const { judul, deskripsi } =
-        req.body;
-      if (!judul) {
-        throw { name: "Bad Request", message: "Judul tidak boleh kosong" };
+      const { name, password } = req.body;
+      if (!name) {
+        throw { name: "Bad Request", message: "Name is required" };
       }
-      await Task.create({judul, deskripsi});
-      return res.status(201).json({ message: "Berhasil membuat tugas dengan judul : " + judul });
+      if (!password) {
+        throw { name: "Bad Request", message: "Password is required" };
+      }
+      const hashedPasswordUser = hashPassword(password);
+      await User.create({ name, password: hashedPasswordUser, role: "Staff" });
+      return res.status(201).json({ message: "Success Created Staff" });
     } catch (error) {
       next(error);
     }
   }
 
-  static async findTasks(req, res, next) {
+  static async login(req, res, next) {
     try {
-      let data = await Task.find();
-      return res.status(200).json(data);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async findTask(req, res, next) {
-    try {
-      const { id } = req.params;
-      let data = await Task.findById(id);
-      if (!data?.judul){
-        throw {name: "Tugas tidak ada", message: "Tugas yang dicari tidak ada"}
+      const { name, password } = req.body;
+      if (!name) {
+        throw { name: "Bad Request", message: "Name is empty" };
       }
-      return res.status(200).json(data);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async updateTask(req, res, next) {
-    try {
-      const { judul, deskripsi, selesai } = req.body;
-      const { id } = req.params;
-      let data = await Task.findById(id);
-      if (!data?.judul){
-        throw {name: "Tugas tidak ada", message: "Tugas yang dicari tidak ada"}
+      if (!password) {
+        throw { name: "Bad Request", message: "Password is empty" };
       }
-      let updatingData = {};
-      if (!judul && !deskripsi && !selesai){
-        throw {name: 'Bad Request', message: "Tugas tidak diperbarui karena tidak ada yang di ubah"}
+      const user = await User.findOne({ name });
+      if (!user) {
+        throw { name: "Invalid", message: "Invalid Name/Password" };
       }
-      if (judul) {
-        updatingData.judul = judul;
+      let isValidPassword = comparePassword(password, user.password)
+      if (!isValidPassword) {
+        throw { name: "Invalid", message: "Invalid Name/Password" };
       }
-      if (deskripsi) {
-        updatingData.deskripsi = deskripsi;
-      }
-      if (selesai) {
-        updatingData.selesai = selesai;
-      }
-      await Task.findOneAndUpdate(
-        {
-          _id: id,
-        },
-        updatingData
-      );
-      return res
-        .status(200)
-        .json({ message: "Tugas berhasil diperbarui"});
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async deleteTask(req, res, next) {
-    try {
-      const { id } = req.params;
-      const data = await Task.findById(id);
-      if (!data?.judul){
-        throw {name: "Tugas tidak ada", message: "Tugas yang dicari tidak ada"}
-      }
-      await Task.findByIdAndDelete(id);
-      return res.status(200).json({ message: "Berhasil menghapus tugas" });
+      const encodedToken = {id: user._id, role: user.role}
+      const access_token = encodeToken(encodedToken)
+      res.status(201).json(access_token);
     } catch (error) {
       next(error);
     }
   }
 }
 
-module.exports = { Tasks };
+module.exports = { Users };

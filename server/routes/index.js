@@ -1,13 +1,13 @@
 const express = require('express')
 const router = express.Router()
-const { Tasks } = require('../controllers/tasks')
+const { Users } = require('../controllers/users')
 
-router.post('/login', Tasks.newTask)
-router.post('/register', Tasks.newTask)
-router.get('/users', Tasks.findTasks)
-router.get('/users/:id', Tasks.findTask)
-router.patch('/users/:id', Tasks.updateTask)
-router.delete('/users/:id', Tasks.deleteTask)
+router.post('/register', Users.register)
+router.post('/login', Users.login)
+// router.get('/users', )
+// router.get('/users/:id', )
+// router.patch('/users/:id', )
+// router.delete('/users/:id', )
 
 
 module.exports = router
