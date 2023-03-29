@@ -1,14 +1,14 @@
 const { decodeToken } = require("../helpers/jwt");
-const {User} = require('../models')
+const User = require("../schema/User");
 
 const authentication = async(req, res, next) => {
     const {access_token} = req.headers
     try {
-        if (!access_token) throw {name: "Invalid token", message: "Token is invalid"}
+        if (!access_token) throw {name: "Invalid", message: "Token is invalid"}
         const payload = decodeToken(access_token)
-        const user = await User.findByPk(payload.id)
-        if (!user) throw {name: "Invalid token", message: "Token is invalid"}
-        req.user = {authorId: user.id}
+        const user = await User.findById(payload.id)
+        if (!user) throw {name: "Invalid", message: "Token is invalid"}
+        req.user = {userId: user.id, role: user.role}
         next()
     } catch (error) {
         next(error)
