@@ -37,7 +37,10 @@ export default function Home() {
                 <th style={{ width: "200px" }}>Name</th>
                 <th style={{ width: "100px" }}>Role</th>
                 {roles === "Admin" && (
-                  <th style={{ width: "100px" }}>Action</th>
+                  <>
+                    <th style={{ width: "150px" }}>Change Role</th>
+                    <th style={{ width: "150px" }}>Delete</th>
+                  </>
                 )}
               </tr>
             </thead>
@@ -50,7 +53,11 @@ export default function Home() {
             )}
           </Table>
           {users.length == 0 && <img src={loading} />}
-          {roles === "Admin" && <Button variant="primary"><Link to='/register'> Add Staff </Link></Button>}
+          {roles === "Admin" && (
+            <Button variant="primary">
+              <Link to="/register"> Add Staff </Link>
+            </Button>
+          )}
 
           <br />
           <br />
