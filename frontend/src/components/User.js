@@ -14,7 +14,6 @@ import Button from "react-bootstrap/Button";
 export default function User({ index, user }) {
   const roles = useSelector((state) => state.users.role);
   const [role, setRole] = useState("");
-  const [canBeChanged, setCanBeChanged] = useState(false);
   const dispatch = useDispatch();
   const changeHandler = (e) => {
     setRole(e.target.value);
@@ -62,7 +61,7 @@ export default function User({ index, user }) {
         <td style={{ maxWidth: "10px" }}>{index + 1}</td>
         <td style={{ maxWidth: "100px", minWidth: "100px" }}>{user.name}</td>
         <td style={{ maxWidth: "100px", minWidth: "100px" }}>{user.role}</td>
-        {roles === "Admin" && user.role !== "Admin" ? (
+        {roles === "Admin" && <>{roles === "Admin" && user.role !== "Admin" ? (
           <>
             <td>
               <form onSubmit={submitHandler}>
@@ -90,7 +89,7 @@ export default function User({ index, user }) {
             <td>No action available</td>
             <td>No action available</td>
           </>
-        )}
+        )}</>}
       </tr>
     </>
   );

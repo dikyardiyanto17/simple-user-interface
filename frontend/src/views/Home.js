@@ -46,13 +46,13 @@ export default function Home() {
             </thead>
             {users && (
               <tbody>
-                {users.map((user, index) => {
+                {users?.map((user, index) => {
                   return <User user={user} key={user._id} index={index} />;
                 })}
               </tbody>
             )}
           </Table>
-          {users.length == 0 && <img src={loading} />}
+          {users?.length == 0 && <img src={loading} />}
           {roles === "Admin" && (
             <Button variant="primary">
               <Link to="/register"> Add Staff </Link>
