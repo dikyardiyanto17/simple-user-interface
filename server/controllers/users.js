@@ -71,6 +71,18 @@ class Users {
     }
   }
 
+  static async findCurrentUser (req, res, next){
+    try {
+      const data = await User.findById(req.user.userId).select('name role')
+      if(!data?.name){
+        throw {name: 'User Not Found', message: 'User is not exist'}
+      }
+      return res.status(200).json(data)
+    } catch (error) {
+      next(error)
+    }
+  }
+
   static async changeUserRole (req, res, next){
     try {
       const {role} = req.body
